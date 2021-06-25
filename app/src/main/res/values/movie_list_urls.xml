@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="now_playing">https://api.themoviedb.org/3/movie/now_playing?api_key=%s</string>
+    <string name="popular">https://api.themoviedb.org/3/movie/popular?api_key=%s</string>
+    <string name="top_rated">https://api.themoviedb.org/3/movie/top_rated?api_key=%s</string>
+    <string name="upcoming">https://api.themoviedb.org/3/movie/upcoming?api_key=%s</string>
+</resources>

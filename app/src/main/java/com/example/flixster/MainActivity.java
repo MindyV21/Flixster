@@ -1,18 +1,27 @@
 package com.example.flixster;
 
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.codepath.asynchttpclient.AsyncHttpClient;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 import com.example.flixster.adapters.MovieAdapter;
 import com.example.flixster.databinding.ActivityMainBinding;
+import com.example.flixster.fragments.MoviesFragment;
 import com.example.flixster.models.Movie;
+import com.google.android.material.navigation.NavigationView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,6 +39,18 @@ public class MainActivity extends AppCompatActivity {
 
     List<Movie> movies;
 
+    private DrawerLayout mDrawer;
+    private Toolbar toolbar;
+    private NavigationView nvDrawer;
+
+    // Make sure to be using androidx.appcompat.app.ActionBarDrawerToggle version.
+    private ActionBarDrawerToggle drawerToggle;
+
+    private MoviesFragment fNowPlaying;
+    private MoviesFragment fPopular;
+    private MoviesFragment fTopRated;
+    private MoviesFragment fUpcoming;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,41 +61,112 @@ public class MainActivity extends AppCompatActivity {
         // R.layout.activity_main originally
         setContentView(view);
 
-//        RecyclerView rvMovies = findViewById(R.id.rvMovies);
-        movies = new ArrayList<>();
+        // init movie lists
+        fNowPlaying = MoviesFragment.newInstance(0);
+        fPopular = MoviesFragment.newInstance(1);
+        fTopRated = MoviesFragment.newInstance(2);
+        fUpcoming = MoviesFragment.newInstance(3);
 
-        // Create the adapter
-        MovieAdapter movieAdapter = new MovieAdapter(this, movies);
+        // Set a Toolbar to replace the ActionBar.
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        // Set the adapter on the recycler view
-        binding.rvMovies.setAdapter(movieAdapter);
+        // This will display an Up icon (<-), we will replace it with hamburger later
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Set a Layout Manager on the recycler view
-        binding.rvMovies.setLayoutManager(new LinearLayoutManager(this));
+        // Find our drawer view
+        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get(NOW_PLAYING_URL, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int i, Headers headers, JSON json) {
-                //Log.d(TAG, "onSuccess");
-                JSONObject jsonObject = json.jsonObject;
-                try {
-                    JSONArray results = jsonObject.getJSONArray("results");
-                    //Log.i(TAG, "Results: " + results.toString());
-                    movies.addAll(Movie.fromJsonArray(results));
-                    // notify adapter that data changed so it renders
-                    movieAdapter.notifyDataSetChanged();
-                    //Log.i(TAG, "Movies: " + movies.size());
-                } catch (JSONException e) {
-                    //Log.e(TAG, "Hit json exception", e);
-                    e.printStackTrace();
-                }
-            }
+        // find drawer view
+        nvDrawer = (NavigationView) findViewById(R.id.nvView);
+        // setup drawer view
+        setupDrawerContent(nvDrawer);
 
-            @Override
-            public void onFailure(int i, Headers headers, String s, Throwable throwable) {
-                //Log.d(TAG, "onFailure: " + throwable.getMessage());
-            }
-        });
+        // initialize default movie list
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.flContent, fNowPlaying).commit();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // The action bar home/up action should open or close the drawer.
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                mDrawer.openDrawer(GravityCompat.START);
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void setupDrawerContent(NavigationView navigationView) {
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        selectDrawerItem(menuItem);
+                        return true;
+                    }
+                });
+    }
+
+    public void selectDrawerItem(MenuItem menuItem) {
+        // Create a new fragment and specify the fragment to show based on nav item clicked
+        MoviesFragment fragment = null;
+
+        // for if fragments are different types !!
+//        Class fragmentClass;
+//        switch(menuItem.getItemId()) {
+//            case R.id.nav_first_fragment:
+//                fragmentClass = FirstFragment.class;
+//                break;
+//            case R.id.nav_second_fragment:
+//                fragmentClass = SecondFragment.class;
+//                break;
+//            case R.id.nav_third_fragment:
+//                fragmentClass = ThirdFragment.class;
+//                break;
+//            default:
+//                fragmentClass = FirstFragment.class;
+//        }
+//
+//        try {
+//            fragment = (Fragment) fragmentClass.newInstance();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+        // select movie list fragment
+        switch(menuItem.getItemId()) {
+            case R.id.nav_now_playing:
+                Log.d("TAG", "NOWPLAYING");
+                fragment = fNowPlaying;
+                break;
+            case R.id.nav_popular:
+                Log.d("TAG", "POPULAR");
+                fragment = fPopular;
+                break;
+            case R.id.nav_top_rated:
+                Log.d("TAG", "NOWPLAYING");
+                fragment = fTopRated;
+                break;
+            case R.id.nav_upcoming:
+                Log.d("TAG", "UPCOMING");
+                fragment = fUpcoming;
+                break;
+            default:
+                fragment = fNowPlaying;
+        }
+
+        // Insert the fragment by replacing any existing fragment
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+
+        // Highlight the selected item has been done by NavigationView
+        menuItem.setChecked(true);
+        // Set action bar title
+        setTitle(menuItem.getTitle());
+        // Close the navigation drawer
+        mDrawer.closeDrawers();
     }
 }
