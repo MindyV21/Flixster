@@ -35,8 +35,10 @@ import okhttp3.Headers;
 
 public class MainActivity extends AppCompatActivity {
 
-    // TODO: create new fragment class for displ💎 Pod # (Name) -aying the latest movie
+    // TODO: create new fragment class for displaying the latest movie
+    // TODO: create new fragment class for displaying the latest movie
     // TODO: add persistence
+    // TODO: changing orientation resets ONLY the content to the default content in set in onCreate()
 
     private DrawerLayout mDrawer;
     private Toolbar toolbar;
