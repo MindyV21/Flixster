@@ -67,13 +67,14 @@ public class MovieDetailsActivity extends YouTubeBaseActivity {
         String imageUrl = movie.getBackdropPath();
         int placeholder = R.drawable.flicks_backdrop_placeholder;
 
-        // set trailer backdrop image
-        //Glide.with(this).load(imageUrl).placeholder(placeholder).into(binding.player);
+        // instantiate youtube
+        YouTubePlayerView youTubePlayerView =
+                (YouTubePlayerView) findViewById(R.id.player);
 
         // request for movie youtube trailer key
         String API_KEY = getString(R.string.themoviedb_api_key);
-
         String url = String.format(MOVIE_TRAILER_URL, movie.getId(), API_KEY);
+
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(url, null, new JsonHttpResponseHandler() {
             @Override
@@ -87,6 +88,9 @@ public class MovieDetailsActivity extends YouTubeBaseActivity {
                     // get first instance in array of movie IDs if possible
                     if (results.length() != 0) {
                         movieKey = results.getJSONObject(0).getString("key");
+
+                        // instantiate movie trailer
+                        initMovieTrailer(youTubePlayerView);
                     }
                 } catch (JSONException e) {
                     Log.e(TAG, "Hit json exception", e);
@@ -100,28 +104,27 @@ public class MovieDetailsActivity extends YouTubeBaseActivity {
             }
         });
 
-        // youtube
-        YouTubePlayerView youTubePlayerView =
-                (YouTubePlayerView) findViewById(R.id.player);
+        // set average by dividing by 2
+        float voteAvg = movie.getVoteAverage().floatValue();
+        binding.rbVoteAverage.setRating(voteAvg / 2.0f);
+    }
 
+    // initializes the specified movie trailer to play
+    public void initMovieTrailer (YouTubePlayerView youTubePlayerView) {
         youTubePlayerView.initialize(getString(R.string.youtube_api_key),
             new YouTubePlayer.OnInitializedListener() {
                 @Override
                 public void onInitializationSuccess(YouTubePlayer.Provider provider,
                                                     YouTubePlayer youTubePlayer, boolean b) {
-
+                    Log.d("YOUTUBE", "onSuccess");
                     // do any work here to cue video, play video, etc.
                     youTubePlayer.cueVideo(movieKey);
                 }
                 @Override
                 public void onInitializationFailure(YouTubePlayer.Provider provider,
                                                     YouTubeInitializationResult youTubeInitializationResult) {
-
+                    Log.d("YOUTUBE", "onFailure: " + youTubeInitializationResult.toString());
                 }
             });
-
-        // set average by dividing by 2
-        float voteAvg = movie.getVoteAverage().floatValue();
-        binding.rbVoteAverage.setRating(voteAvg / 2.0f);
     }
 }
