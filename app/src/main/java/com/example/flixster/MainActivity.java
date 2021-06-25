@@ -56,24 +56,24 @@ public class MainActivity extends AppCompatActivity {
         client.get(NOW_PLAYING_URL, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int i, Headers headers, JSON json) {
-                Log.d(TAG, "onSuccess");
+                //Log.d(TAG, "onSuccess");
                 JSONObject jsonObject = json.jsonObject;
                 try {
                     JSONArray results = jsonObject.getJSONArray("results");
-                    Log.i(TAG, "Results: " + results.toString());
+                    //Log.i(TAG, "Results: " + results.toString());
                     movies.addAll(Movie.fromJsonArray(results));
                     // notify adapter that data changed so it renders
                     movieAdapter.notifyDataSetChanged();
-                    Log.i(TAG, "Movies: " + movies.size());
+                    //Log.i(TAG, "Movies: " + movies.size());
                 } catch (JSONException e) {
-                    Log.e(TAG, "Hit json exception", e);
+                    //Log.e(TAG, "Hit json exception", e);
                     e.printStackTrace();
                 }
             }
 
             @Override
             public void onFailure(int i, Headers headers, String s, Throwable throwable) {
-                Log.d(TAG, "onFailure: " + throwable.getMessage());
+                //Log.d(TAG, "onFailure: " + throwable.getMessage());
             }
         });
     }
