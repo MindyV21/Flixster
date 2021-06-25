@@ -35,7 +35,8 @@ import okhttp3.Headers;
 
 public class MainActivity extends AppCompatActivity {
 
-    List<Movie> movies;
+    // TODO: create new fragment class for displ💎 Pod # (Name) -aying the latest movie
+    // TODO: add persistence
 
     private DrawerLayout mDrawer;
     private Toolbar toolbar;
