@@ -51,11 +51,6 @@ public class MovieDetailsActivity extends YouTubeBaseActivity {
         View view = binding.getRoot();
         setContentView(view);
 
-//        // resolve the view objects
-//        tvTitle = (TextView) findViewById(R.id.tvTitle);
-//        tvOverview = (TextView) findViewById(R.id.tvOverview);
-//        rbVoteAverage = (RatingBar) findViewById(R.id.rbVoteAverage);
-
         // unwrap movie passed in via intent, using its simple name as a key
         movie = (Movie) Parcels.unwrap(getIntent().getParcelableExtra(Movie.class.getSimpleName()));
         Log.d("MovieDetailsActivity", String.format("Showing details for '%s'", movie.getTitle()));
